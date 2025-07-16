@@ -23,13 +23,12 @@ just a zero
 """
 
 import argparse
-from pwn import *
+import struct
 import time
 import serial
 
 from util import *
 
-ser = serial.Serial("/dev/ttyACM0", 115200)
 
 RESP_OK = b"\x00"
 FRAME_SIZE = 256
@@ -37,8 +36,7 @@ FRAME_SIZE = 256
 
 def send_metadata(ser, metadata, debug=False):
     assert(len(metadata) == 4)
-    version = u16(metadata[:2], endian='little')
-    size = u16(metadata[2:], endian='little')
+    version, size = struct.unpack('<HH', metadata)
     print(f"Version: {version}\nSize: {size} bytes\n")
 
     # Handshake for update
@@ -92,7 +90,7 @@ def update(ser, infile, debug):
         data = firmware[frame_start : frame_start + FRAME_SIZE]
 
         # Construct frame.
-        frame = p16(len(data), endian='big') + data
+        frame = struct.pack('>H', len(data)) + data
 
         send_frame(ser, frame, debug=debug)
         print(f"Wrote frame {idx} ({len(frame)} bytes)")
@@ -100,22 +98,24 @@ def update(ser, infile, debug):
     print("Done writing firmware.")
 
     # Send a zero length payload to tell the bootlader to finish writing it's page.
-    ser.write(p16(0x0000, endian='big'))
+    ser.write(b'\x00\x00')
     resp = ser.read(1)  # Wait for an OK from the bootloader
     if resp != RESP_OK:
         raise RuntimeError("ERROR: Bootloader responded to zero length frame with {}".format(repr(resp)))
     print(f"Wrote zero length frame (2 bytes)")
 
-    return ser
+    return 
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Firmware Update Tool")
 
-    parser.add_argument("--port", help="Does nothing, included to adhere to command examples in rule doc", required=False)
+    parser.add_argument("--port", help="Provide a path to the Tiva device (default=/dev/ttyACM0)", default='/dev/ttyACM0', required=False)
     parser.add_argument("--firmware", help="Path to firmware image to load.", required=False)
     parser.add_argument("--debug", help="Enable debugging messages.", action="store_true")
     args = parser.parse_args()
+
+    ser = serial.Serial(args.port, 115200)
 
     update(ser=ser, infile=args.firmware, debug=args.debug)
     ser.close()

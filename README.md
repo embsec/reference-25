@@ -103,10 +103,10 @@ A sample `user_settings.h` is available in the ./bootloader/inc directory. This 
 
 # Bundling and Updating Firmware
 
-1. Enter the firmware directory and `make` the example firmware.
+1. Enter the firmware directory and `make` the example firmware. You will not have to design a firmware for this challenge, teams will be provided with firmwares built by the instructors during the attack phase. The `firmware` directory contains an example firmware.
 
 ```
-cd ./firmware
+cd ../firmware
 make
 ```
 
@@ -124,7 +124,7 @@ This creates a firmware bundle called `firmware_protected.bin` in the tools dire
 4. Run `fw_update.py`
 
 ```
-python fw_update.py --firmware ./firmware_protected.bin
+python fw_update.py --firmware ./firmware_protected.bin --port <Path to your Tiva (/dev/ttyACM0, /dev/tty.usb...)> --debug
 ```
 
 If the firmware bundle is accepted by the bootloader, the `fw_update.py` tool will report it wrote all frames successfully.
@@ -132,11 +132,6 @@ If the firmware bundle is accepted by the bootloader, the `fw_update.py` tool wi
 Additional firmwares can be updated by repeating steps 3 and 4, but only firmware versions higher than the one flashed to the board (or version 0) will be accepted.
 
 # Interacting with the Bootloader
-
-Using the custom `car-serial` script:
-```
-car-serial
-```
 
 Using `pyserial` module:
 
