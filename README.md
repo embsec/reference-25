@@ -88,6 +88,19 @@ python bl_build.py
 sudo lm4flash ../bootloader/bin/bootloader.bin
 ```
 
+## Using WolfSSL
+
+In order to use the WolfSSL cryptographic functionality, you will need to first clone the WolfSSL repository. This repository contains WolfSSL as a submodule:
+
+Run to clone wolfssl to ./lib
+```
+git submodule update --init --recursive
+```
+
+You must also uncomment the wolfssl build instructions in the ./bootloader/Makefile in order to include WolfSSL in your build.
+
+A sample `user_settings.h` is available in the ./bootloader/inc directory. This will allow you to configure the library to suit your project needs.
+
 # Bundling and Updating Firmware
 
 1. Enter the firmware directory and `make` the example firmware.

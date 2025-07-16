@@ -481,7 +481,7 @@ extern "C" {
 #define WOLFSSL_USER_CURRTIME
 #define WOLFSSL_GMTIME
 #define USER_TICKS
-extern unsigned long my_time(unsigned long* timer);
+extern unsigned long my_time(long long* timer);
 #define XTIME my_time
 
 
