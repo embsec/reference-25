@@ -21,23 +21,6 @@
 #define UPDATE ((unsigned char)'U')
 #define BOOT ((unsigned char)'B')
 
-// Data buffer sizes
-#define META_LEN 22 // Excludes message bytes
-#define IV_LEN 16
-#define MAX_MSG_LEN 256
-#define BLOCK_SIZE FLASH_PAGESIZE
-#define SIG_SIZE 256
-#define CHUNK_SIZE (BLOCK_SIZE + SIG_SIZE)
-
-#define MAX_CHUNK_NO 32 // 30KB firmware + padding
-
-// Return messages
-#define VERIFY_SUCCESS 0
-#define VERIFY_ERR 1
-
-#define FW_LOADED 0
-#define FW_ERROR 1
-
 typedef struct fw_meta_s {
     uint16_t    ver;                // Version of current fw being loaded
     uint16_t    min_ver;            // Miniumum fw version (not updated when debug fw loaded) 

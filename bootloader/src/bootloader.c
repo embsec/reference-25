@@ -18,12 +18,6 @@
 #include "driverlib/gpio.h"
 #include "uart/uart.h"
 
-// Cryptography Imports
-#include "wolfssl/wolfcrypt/settings.h"
-#include "wolfssl/wolfcrypt/aes.h"
-#include "wolfssl/wolfcrypt/sha.h"
-#include "wolfssl/wolfcrypt/rsa.h"
-
 // Forward Declarations
 void load_firmware(void);
 void boot_firmware(void);
@@ -37,12 +31,6 @@ void uart_write_hex_bytes(uint8_t, uint8_t *, uint32_t);
 #define FLASH_PAGESIZE 1024
 #define FLASH_WRITESIZE 4
 
-// Protocol Constants
-#define OK ((unsigned char)0x00)
-#define ERROR ((unsigned char)0x01)
-#define UPDATE ((unsigned char)'U')
-#define BOOT ((unsigned char)'B')
-
 // Device metadata
 uint16_t * fw_version_address = (uint16_t *)METADATA_BASE;
 uint16_t * fw_size_address = (uint16_t *)(METADATA_BASE + 2);
@@ -51,46 +39,8 @@ uint8_t * fw_release_message_address;
 // Firmware Buffer
 unsigned char data[FLASH_PAGESIZE];
 
-// Delay to allow time to connect GDB
-// green LED as visual indicator of when this function is running
-void debug_delay_led() {
-
-    // Enable the GPIO port that is used for the on-board LED.
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-
-    // Check if the peripheral access is enabled.
-    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF)) {
-    }
-
-    // Enable the GPIO pin for the LED (PF3).  Set the direction as output, and
-    // enable the GPIO pin for digital function.
-    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
-
-    // Turn on the green LED
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, GPIO_PIN_3);
-
-    // Wait
-    SysCtlDelay(SysCtlClockGet() * 2);
-
-    // Turn off the green LED
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_3, 0x0);
-}
-
 
 int main(void) {
-
-    // Enable the GPIO port that is used for the on-board LED.
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-
-    // Check if the peripheral access is enabled.
-    while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOF)) {
-    }
-
-    // Enable the GPIO pin for the LED (PF3).  Set the direction as output, and
-    // enable the GPIO pin for digital function.
-    GPIOPinTypeGPIOOutput(GPIO_PORTF_BASE, GPIO_PIN_3);
-
-    // debug_delay_led();
 
     initialize_uarts(UART0);
 
@@ -258,8 +208,8 @@ void boot_firmware(void) {
     }
 
     if (!fw_present) {
-        uart_write_str(UART0, "No firmware loaded.\n");
-        SysCtlReset();            // Reset device
+        uart_write_str(UART0, "No firmware loaded. Please RESET device.\n");
+        while (1) { }           // Reset device
         return;
     }
 
