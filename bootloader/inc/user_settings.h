@@ -119,7 +119,7 @@ extern "C" {
 /* ------------------------------------------------------------------------- */
 /* RSA */
 #undef NO_RSA
-#if 1
+#if 0
     #ifdef USE_FAST_MATH
         /* Maximum math bits (Max RSA key bits * 2) */
         #undef  FP_MAX_BITS
